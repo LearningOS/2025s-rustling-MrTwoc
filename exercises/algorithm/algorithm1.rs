@@ -2,7 +2,9 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+//https://github.com/MrTwoc/rust-rustlings-2024-autumn-MrTwoc/blob/main/exercises/algorithm/algorithm1.rs
+
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -34,7 +36,6 @@ impl<T> Default for LinkedList<T> {
         Self::new()
     }
 }
-
 impl<T> LinkedList<T> {
     pub fn new() -> Self {
         Self {
@@ -43,6 +44,16 @@ impl<T> LinkedList<T> {
             end: None,
         }
     }
+}
+
+impl<T: PartialOrd + Clone + std::cmp::PartialOrd> LinkedList<T> {
+    // pub fn new() -> Self {
+    //     Self {
+    //         length: 0,
+    //         start: None,
+    //         end: None,
+    //     }
+    // }
 
     pub fn add(&mut self, obj: T) {
         let mut node = Box::new(Node::new(obj));
@@ -72,11 +83,44 @@ impl<T> LinkedList<T> {
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+
+        let mut merge_list = LinkedList::new();
+
+        let mut l_a = list_a.start;
+        let mut l_b = list_b.start;
+
+        while l_a.is_some() || l_b.is_some(){
+            let a_next_val = l_a.map(|node| unsafe { &(*node.as_ptr()).val });
+            let b_next_val = l_b.map(|node| unsafe { &(*node.as_ptr()).val });
+
+            match (a_next_val, b_next_val) {
+                (Some(a_val), Some(b_val)) => {
+                    if a_val <= b_val {
+                        merge_list.add(a_val.clone());
+                        l_a = unsafe { (*l_a.unwrap().as_ptr()).next };
+                    }else{
+                        merge_list.add(b_val.clone());
+                        l_b = unsafe { (*l_b.unwrap().as_ptr()).next };
+                    }
+                },
+                (Some(a_val), None) => {
+                    merge_list.add(a_val.clone());
+                    l_a = unsafe { (*l_a.unwrap().as_ptr()).next };
+                },
+                (None,Some(b_val)) => {
+                    merge_list.add(b_val.clone());
+                    l_b = unsafe { (*l_b.unwrap().as_ptr()).next };
+                },
+                (None, None) => break,
+            }
         }
+		// Self {
+        //     length: 0,
+        //     start: None,
+        //     end: None,
+        // }
+        merge_list
+    
 	}
 }
 
